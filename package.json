@@ -1,15 +1,31 @@
 {
   "name": "tmux-orchestrator",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "packageManager": "pnpm@10.24.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "skills"
+  ],
   "bin": {
     "tmux-orchestrator": "./dist/src/cli.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trknhr/tmux-orchestrator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/trknhr/tmux-orchestrator/issues"
+  },
+  "homepage": "https://github.com/trknhr/tmux-orchestrator#readme",
   "scripts": {
     "build": "tsc",
     "cli": "pnpm run build && node dist/src/cli.js",
+    "prepack": "pnpm run build",
     "test": "pnpm run build && node --test test/*.test.js"
   },
   "devDependencies": {

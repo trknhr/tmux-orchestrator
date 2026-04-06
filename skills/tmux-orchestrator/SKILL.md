@@ -1,31 +1,31 @@
 ---
 name: tmux-orchestrator
-description: Orchestrate long-running tmux-backed coding agents through the tmux-orchestrator CLI in this repository. Use when the user wants to spawn or reuse agents, assign bounded tasks, inspect tmux sessions, wait for completion, or collect artifacts for roles like reviewer, investigator, or implementer.
+description: Orchestrate long-running tmux-backed coding agents through the tmux-orchestrator CLI. Use when the user wants to spawn or reuse agents, assign bounded tasks, inspect tmux sessions, wait for completion, or collect artifacts for roles like reviewer, investigator, or implementer.
 ---
 
 # Tmux Orchestrator
 
-Use this skill from the `tmux-orchestrator` repo root.
+Use this skill from the repository you want to orchestrate.
 
 ## Workflow
 
 1. Check prerequisites
-- Confirm `tmux` and `codex` are available.
-- If `dist/src/cli.js` is missing, run `pnpm run build`.
-- Prefer `node dist/src/cli.js` after the build exists so repeated commands do not rebuild every time.
+- Confirm `tmux` and an agent runtime such as `codex` or `claude-code` are available.
+- Confirm `tmux-orchestrator` is available on `PATH`.
+- If it is missing, install it first with `npm install -g tmux-orchestrator` or `pnpm add -g tmux-orchestrator`.
 
 2. Inspect current state first
 - Start the turn by auto-watching for task completions with:
-  `node dist/src/cli.js events --peek`
-- If `events --peek` returns `task.completed`, immediately run `node dist/src/cli.js collect <task-id>`.
-- If `events --peek` returns `task.failed` or `task.timed-out`, surface that to the user and then acknowledge it with `node dist/src/cli.js events ack <task-id>`.
-- Run `node dist/src/cli.js ps`.
+  `tmux-orchestrator events --peek`
+- If `events --peek` returns `task.completed`, immediately run `tmux-orchestrator collect <task-id>`.
+- If `events --peek` returns `task.failed` or `task.timed-out`, surface that to the user and then acknowledge it with `tmux-orchestrator events ack <task-id>`.
+- Run `tmux-orchestrator ps`.
 - Reuse an existing idle agent when possible instead of spawning duplicates.
 - Do not guess task IDs, socket paths, session names, or artifact paths. Read them from CLI output or `.tmux-orchestrator/registry.json`.
 
 3. Spawn an agent when needed
 - Command template:
-  `node dist/src/cli.js spawn <agent-id> --workdir "$PWD" --role <role>`
+  `tmux-orchestrator spawn <agent-id> --workdir "$PWD" --role <role>`
 - Use short stable agent IDs such as `reviewer`, `investigator`, and `implementer`.
 - If tmux socket access fails in the sandbox with errors like `Operation not permitted`, rerun the command with escalation.
 - After spawning, always show both monitor commands returned by the CLI:
@@ -34,20 +34,20 @@ Use this skill from the `tmux-orchestrator` repo root.
 
 4. Assign a bounded task
 - Command template:
-  `node dist/src/cli.js assign <agent-id> --goal "<goal>" --instructions "<instructions>" --timeout-seconds <seconds>`
+  `tmux-orchestrator assign <agent-id> --goal "<goal>" --instructions "<instructions>" --timeout-seconds <seconds>`
 - Keep the task single-purpose and artifact-oriented.
 - If the agent is already `busy`, do not interrupt or reassign unless the user explicitly asks.
-- After assign, run `node dist/src/cli.js ps` to confirm the task ID and runtime state.
+- After assign, run `tmux-orchestrator ps` to confirm the task ID and runtime state.
 
 5. Prefer dispatch for role-based routing
 - When the user gives a natural-language request and wants the skill to choose the worker role, use:
-  `node dist/src/cli.js dispatch "<request>"`
+  `tmux-orchestrator dispatch "<request>"`
 - `dispatch` routes requests to fixed roles like `planner`, `reviewer`, `investigator`, `implementer`, and `docs`.
 - It auto-spawns the configured agent when missing, then assigns the task.
 - Override routing when needed with:
-  `node dist/src/cli.js dispatch "<request>" --kind <kind>`
+  `tmux-orchestrator dispatch "<request>" --kind <kind>`
   or
-  `node dist/src/cli.js dispatch "<request>" --route <route>`
+  `tmux-orchestrator dispatch "<request>" --route <route>`
 - The default config directory is `./.tmux-orchestrator`. Use `roles.json` and `routes.json` there to lock a role to a runtime such as `codex` or `claude-code`.
 - If a role's configured runtime changes, either respawn that role or give the new runtime a different `agentId`.
 
@@ -58,7 +58,7 @@ Use this skill from the `tmux-orchestrator` repo root.
 
 7. Check for completion with events
 - Treat `events` as the skill's automatic watch loop.
-- Run `node dist/src/cli.js events --peek` at the start of each turn that uses this skill, and again after background assignments when helpful.
+- Run `tmux-orchestrator events --peek` at the start of each turn that uses this skill, and again after background assignments when helpful.
 - Use plain `events` when you intentionally want "read and acknowledge" in one step.
 - `events --peek` is the default non-blocking completion check for hook-friendly workflows.
 - When `events --peek` reports `task.completed`, immediately collect it in the same turn before doing other orchestration work.
@@ -66,8 +66,8 @@ Use this skill from the `tmux-orchestrator` repo root.
 
 8. Use follow only when the user asks to block
 - In this skill, `follow` means:
-  - `node dist/src/cli.js wait <task-id>`
-  - `node dist/src/cli.js collect <task-id>`
+  - `tmux-orchestrator wait <task-id>`
+  - `tmux-orchestrator collect <task-id>`
 - If `wait` times out or fails, stop there and report the status instead of forcing `collect`.
 
 9. Watch while the task is running

@@ -3,31 +3,45 @@
 Small tmux-backed orchestration CLI for running multiple interactive coding agents on an
 isolated socket.
 
+## Install
+
+```bash
+npm install -g tmux-orchestrator
+```
+
+Or run it without a global install:
+
+```bash
+npx tmux-orchestrator@latest ps
+```
+
+Prerequisites:
+
+- `tmux`
+- an agent runtime such as `codex` or `claude-code` available on `PATH`
+
 ## Commands
 
 ```bash
-pnpm install
-pnpm run build
+tmux-orchestrator spawn reviewer --workdir ~/src/github.com/paperclipai/paperclip --role reviewer
+tmux-orchestrator spawn implementer --workdir ~/src/github.com/paperclipai/paperclip --role implementer
+tmux-orchestrator spawn docs --workdir "$PWD" --role docs --command "codex --profile docs"
 
-pnpm run cli -- spawn reviewer --workdir ~/src/github.com/paperclipai/paperclip --role reviewer
-pnpm run cli -- spawn implementer --workdir ~/src/github.com/paperclipai/paperclip --role implementer
-pnpm run cli -- spawn docs --workdir "$PWD" --role docs --command "codex --profile docs"
-
-pnpm run cli -- assign reviewer \
+tmux-orchestrator assign reviewer \
   --goal "Review the current branch for regressions and missing tests" \
   --instructions "Do not modify files. Write findings only." \
   --timeout-seconds 900
 
-pnpm run cli -- dispatch "Review the current branch for regressions and missing tests"
-pnpm run cli -- dispatch "Plan how to add automatic role routing for multi-stage work"
-pnpm run cli -- dispatch "Update the README to explain the new dispatch command"
+tmux-orchestrator dispatch "Review the current branch for regressions and missing tests"
+tmux-orchestrator dispatch "Plan how to add automatic role routing for multi-stage work"
+tmux-orchestrator dispatch "Update the README to explain the new dispatch command"
 
-pnpm run cli -- ps
-pnpm run cli -- events
-pnpm run cli -- events --peek --json
-pnpm run cli -- events ack T-001
-pnpm run cli -- wait T-001
-pnpm run cli -- collect T-001
+tmux-orchestrator ps
+tmux-orchestrator events
+tmux-orchestrator events --peek --json
+tmux-orchestrator events ack T-001
+tmux-orchestrator wait T-001
+tmux-orchestrator collect T-001
 ```
 
 ## Model
@@ -106,4 +120,13 @@ Default socket path:
 
 ```bash
 ${TMUX_ORCHESTRATOR_SOCKET_DIR:-${TMPDIR:-/tmp}/tmux-orchestrator-sockets}/orchestrator.sock
+```
+
+## Development
+
+```bash
+pnpm install
+pnpm run build
+pnpm run cli -- ps
+pnpm test
 ```
