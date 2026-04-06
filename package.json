@@ -1,0 +1,19 @@
+{
+  "name": "tmux-orchestrator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.24.0",
+  "bin": {
+    "tmux-orchestrator": "./dist/src/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "cli": "pnpm run build && node dist/src/cli.js",
+    "test": "pnpm run build && node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tmux Orchestrator"
+  short_description: "Route work to tmux-backed planner, reviewer, investigator, implementer, or docs agents"
+  default_prompt: "Use $tmux-orchestrator to auto-watch with events --peek at the start of the turn, immediately collect completed tasks, then prefer dispatch for role-based routing and background execution."
